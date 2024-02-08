@@ -1,0 +1,203 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  RUST_BACKTRACE: 1
+
+jobs:
+  test:
+    name: Test Rust - ${{ matrix.build }}
+    runs-on: ${{ matrix.os }}
+    env:
+      CARGO: cargo
+      TARGET: ""
+    strategy:
+      fail-fast: false
+      matrix:
+        build:
+          - macos
+          - linux
+          - linux32
+          - win64-msvc
+          - win64-gnu
+          - win32-msvc
+          - win32-gnu
+          - beta
+          - nightly
+          - arm32
+          - arm64
+          - ppc32
+          - ppc64
+        include:
+          - build: linux
+            os: ubuntu-latest
+            rust: stable
+          - build: macos
+            os: macos-latest
+            rust: stable
+          - build: win64-msvc
+            os: windows-2019
+            rust: stable
+          - build: win64-gnu
+            os: windows-2019
+            rust: stable-x86_64-gnu
+          - build: win32-msvc
+            os: windows-2019
+            rust: stable-i686-msvc
+          - build: win32-gnu
+            os: windows-2019
+            rust: stable-i686-gnu
+          - build: beta
+            os: ubuntu-latest
+            rust: beta
+          - build: nightly
+            os: ubuntu-latest
+            rust: nightly
+          - build: linux32
+            os: ubuntu-latest
+            rust: stable
+            target: i686-unknown-linux-gnu
+          # These should prob. be more generic arm targets and not android.
+          - build: arm32
+            os: ubuntu-latest
+            rust: stable
+            target: armv7-linux-androideabi
+          - build: arm64
+            os: ubuntu-latest
+            rust: stable
+            target: aarch64-linux-android
+          # ppc is big endian.
+          - build: ppc32
+            os: ubuntu-latest
+            rust: stable
+            target: powerpc-unknown-linux-gnu
+          - build: ppc64
+            os: ubuntu-latest
+            rust: stable
+            target: powerpc64-unknown-linux-gnu
+          - build: riscv
+            os: ubuntu-latest
+            rust: stable
+            target: riscv64gc-unknown-linux-gnu
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust }}
+
+      - name: Setup cross if needed
+        if: matrix.target != ''
+        run: |
+          cargo install cross
+          echo "CARGO=cross" >> $GITHUB_ENV
+          echo "TARGET=--target ${{ matrix.target }}" >> $GITHUB_ENV
+
+      - name: Show command used for Cargo
+        run: |
+          echo "cargo command is: ${{ env.CARGO }}"
+          echo "target flag is: ${{ env.TARGET }}"
+
+      - name: Test
+        run: ${{ env.CARGO }} test --verbose ${{ env.TARGET }}
+
+  miri:
+    name: Miri
+    runs-on: ubuntu-latest
+    env:
+      RUSTFLAGS: "-Zrandomize-layout"
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: nightly
+          components: miri
+      - name: Run tests
+        run: cargo miri test
+
+  cargo-clippy:
+    name: Lint
+    runs-on: ubuntu-latest
+    env:
+      RUSTFLAGS: -Dwarnings
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+      - name: Run cargo clippy (default features)
+        run: cargo clippy --all-targets --verbose -- -D clippy::all
+
+  # Ensure patch is formatted.
+  fmt:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          components: rustfmt
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+
+  # Check doc reference links are all valid.
+  doc:
+    name: Doc check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: nightly
+      - name: Check docs
+        # Note: needs cargo rustdoc, not cargo doc.
+        run: cargo rustdoc --all-features -- -D warnings
+
+  sanitizers:
+    name: Test sanitizer ${{ matrix.sanitizer }}
+    runs-on: ubuntu-latest
+    env:
+      RUST_BACKTRACE: 0
+      # only used by asan, but we set it for all of them cuz its easy
+      ASAN_OPTIONS: detect_stack_use_after_return=1
+
+    strategy:
+      fail-fast: false
+      matrix:
+        sanitizer: [address, memory]
+        include:
+          - sanitizer: memory
+            extra_rustflags: "-Zsanitizer-memory-track-origins"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: nightly
+          components: rust-src
+
+      - name: Test with sanitizer
+        env:
+          RUSTFLAGS: -Zsanitizer=${{ matrix.sanitizer }} ${{ matrix.extra_rustflags }}
+          RUSTDOCFLAGS: -Zsanitizer=${{ matrix.sanitizer }} ${{ matrix.extra_rustflags }}
+        run: |
+          echo "note: RUSTFLAGS='$RUSTFLAGS'"
+          cargo -Zbuild-std test --target=x86_64-unknown-linux-gnu
