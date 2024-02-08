@@ -1,0 +1,8 @@
+[package]
+name = "bool-toggle"
+version = "1.0.0"
+edition = "2021"
+
+[package.metadata.docs.rs]
+# enable unstable features in the documentation
+rustdoc-args = ["--cfg", "docsrs"]
