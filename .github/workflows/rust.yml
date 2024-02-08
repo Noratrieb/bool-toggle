@@ -64,7 +64,7 @@ jobs:
             os: ubuntu-latest
             rust: stable
             target: i686-unknown-linux-gnu
-          # These should prob. be more generic arm targets and not android.
+            # should probably not be android
           - build: arm32
             os: ubuntu-latest
             rust: stable
@@ -72,7 +72,7 @@ jobs:
           - build: arm64
             os: ubuntu-latest
             rust: stable
-            target: aarch64-linux-android
+            target: aarch64-unknown-linux-gnu
           # ppc is big endian.
           - build: ppc32
             os: ubuntu-latest
