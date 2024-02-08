@@ -170,6 +170,17 @@ jobs:
         # Note: needs cargo rustdoc, not cargo doc.
         run: cargo rustdoc --all-features -- -D warnings
 
+  vibe_check:
+    name: Vibe check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Vibe check
+        run: |
+          if [ $((RANDOM % 3)) -eq 0 ]; then
+            echo "Failed the vibe check!"
+            exit 1
+          fi
+
   sanitizers:
     name: Test sanitizer ${{ matrix.sanitizer }}
     runs-on: ubuntu-latest
