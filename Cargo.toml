@@ -2,6 +2,7 @@
 name = "bool-toggle"
 version = "1.0.0"
 edition = "2021"
+license = "MIT"
 
 [package.metadata.docs.rs]
 # enable unstable features in the documentation
