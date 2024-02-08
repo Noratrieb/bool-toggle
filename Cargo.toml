@@ -4,6 +4,7 @@ description = "bool toggling for the bool toggle enjoyers"
 version = "1.0.0"
 edition = "2021"
 license = "MIT"
+repository = "https://github.com/Nilstrieb/bool-toggle"
 
 [package.metadata.docs.rs]
 # enable unstable features in the documentation
