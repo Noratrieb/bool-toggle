@@ -1,5 +1,6 @@
 [package]
 name = "bool-toggle"
+description = "bool toggling for the bool toggle enjoyers"
 version = "1.0.0"
 edition = "2021"
 license = "MIT"
