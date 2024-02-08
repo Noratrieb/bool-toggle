@@ -21,6 +21,16 @@ impl TogglingIsALifestyle for bool {
     }
 }
 
+#[cfg(enterprise_license)]
+impl<const N: usize> TogglingIsALifestyle for [bool; N] {
+    fn toggle(&mut self) {
+        // i am so fast
+        for b in self {
+            *b ^= true;
+        }
+    }
+}
+
 #[cfg(test)]
 #[allow(clippy::bool_assert_comparison)]
 mod tests {
@@ -50,5 +60,11 @@ mod enteprise_tests {
         let mut b = false;
         b.toggle();
         assert_eq!(b, true);
+    }
+    #[test]
+    fn enterprise_simd_toggle() {
+        let mut b = [false, true, false];
+        b.toggle();
+        assert_eq!(b, [true, false, true]);
     }
 }
