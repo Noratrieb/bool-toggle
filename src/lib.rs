@@ -22,6 +22,7 @@ impl TogglingIsALifestyle for bool {
 }
 
 #[cfg(test)]
+#[allow(clippy::bool_assert_comparison)]
 mod tests {
     // cheap tests
 
@@ -37,6 +38,7 @@ mod tests {
 }
 
 #[cfg(all(test, enterprise_license))]
+#[allow(clippy::bool_assert_comparison)]
 mod enteprise_tests {
     // enterprise-grade tests
     // only ran when using an enterprise license for the bool-toggle crate
