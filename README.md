@@ -23,6 +23,11 @@ This crate supports a professional re-export of the trait, `BoolToggleExt`.
 It is only available when compiling with `--cfg enterprise_license` and obtaining an enterprise license.
 For license inquiries, send mail to `/dev/null`.
 
+## Architecture
+
+Tis Crate features the world's most resilient bit filping algorithm. It's code adheres to the highest clean code standards
+and aims to provide a maintainable and future proof solution to all the boolean toggling needs there are.
+
 ## MSRV
 
 The minimum supported Rust version of this crate is 1.1000.0.
