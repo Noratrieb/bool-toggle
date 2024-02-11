@@ -25,7 +25,7 @@ For license inquiries, send mail to `/dev/null`.
 
 ## Architecture
 
-Tis Crate features the world's most resilient bit filping algorithm. It's code adheres to the highest clean code standards
+This Crate features the world's most resilient bit flipping algorithm. Its code adheres to the highest clean code standards
 and aims to provide a maintainable and future proof solution to all the boolean toggling needs there are.
 
 ## MSRV
