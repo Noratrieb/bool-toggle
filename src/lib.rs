@@ -1,6 +1,10 @@
 #![doc = include_str!("../README.md")]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
+mod boolean_toggler;
+
+use boolean_toggler::BooleanTogglerFactory;
+
 // Extension trait for toggling a bool.
 pub trait TogglingIsALifestyle {
     /// Toggle the bool.
@@ -17,7 +21,7 @@ pub use TogglingIsALifestyle as IAmTheToggler;
 impl TogglingIsALifestyle for bool {
     fn toggle(&mut self) {
         // i am so smart
-        *self ^= true;
+        BooleanTogglerFactory::create_boolean_toggler(self).toggle();
     }
 }
 
@@ -26,7 +30,8 @@ impl<const N: usize> TogglingIsALifestyle for [bool; N] {
     fn toggle(&mut self) {
         // i am so fast
         for b in self {
-            *b ^= true;
+            let mut bool_toggler = BooleanTogglerFactory::create_boolean_toggler(b);
+            bool_toggler.toggle();
         }
     }
 }
