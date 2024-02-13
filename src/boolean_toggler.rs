@@ -17,8 +17,6 @@ pub struct BooleanTogglerFactory;
 impl BooleanTogglerFactory {
     #[inline]
     pub fn create_boolean_toggler(bool_to_toggle: &mut bool) -> BooleanToggler {
-        return BooleanToggler {
-            bool_to_toggle: bool_to_toggle,
-        };
+        BooleanToggler { bool_to_toggle }
     }
 }
