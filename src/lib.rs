@@ -21,8 +21,7 @@ pub use TogglingIsALifestyle as IAmTheToggler;
 impl TogglingIsALifestyle for bool {
     fn toggle(&mut self) {
         // i am so smart
-        let mut bool_toggler = BooleanTogglerFactory::create_boolean_toggler(self);
-        bool_toggler.toggle();
+        BooleanTogglerFactory::create_boolean_toggler(self).toggle();
     }
 }
 
@@ -31,7 +30,7 @@ impl<const N: usize> TogglingIsALifestyle for [bool; N] {
     fn toggle(&mut self) {
         // i am so fast
         for b in self {
-            let mut bool_toggler = BooleanTogglerFactory::create_boolean_toggler(self);
+            let mut bool_toggler = BooleanTogglerFactory::create_boolean_toggler(b);
             bool_toggler.toggle();
         }
     }
